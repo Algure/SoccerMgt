@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'MainEventsPage.dart';
+import 'Pages/MainEventsPage.dart';
 
 void main() {
   runApp(MyApp());

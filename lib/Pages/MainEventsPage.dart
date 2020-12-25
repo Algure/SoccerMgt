@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:soccermgt/EventData.dart';
-import 'package:soccermgt/UploadPage.dart';
+import 'package:soccermgt/Pages/ProposalsPage.dart';
+import 'file:///C:/FlutterProjects/SoccerMgt/flutter_app/lib/Pages/UploadPage.dart';
 import 'package:soccermgt/customViews/my_button.dart';
 import 'package:soccermgt/utilities.dart';
-import 'customViews/EventsListItem.dart';
-import 'database/OnlineEventsDB.dart';
+import '../customViews/EventsListItem.dart';
+import '../database/OnlineEventsDB.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -62,6 +63,22 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Events'),
+          BottomNavigationBarItem(icon: Icon(Icons.mail), label: 'Proposals'),
+        ],
+        backgroundColor: Colors.transparent,
+        currentIndex: 0,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
+        onTap: (dex){
+          if(dex==1){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>Proposals()));
+          }
+        },
+      ),
+
     );
   }
 
@@ -70,11 +87,11 @@ class _MyHomePageState extends State<MyHomePage> {
     DateTime now= DateTime.now();
     String formattedDate=  DateFormat('YY:MM:dd').format(now);
     if(!(await uCheckInternet()) || ((await uGetSharedPrefValue('ldate')).toString())==formattedDate){
+
       showProgress(false);
-      setListFromDb();
+      await setListFromDb();
       return;
     }
-    uSetPrefsValue('ldate', formattedDate);
     itemList=[];
     DatabaseReference myRef=FirebaseDatabase.instance.reference().child('Eve');
     DataSnapshot snapShot=await myRef.once();
@@ -97,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       await sDb.insertItem(id: key, item: maps[key]);
     }
+    uSetPrefsValue('ldate', formattedDate);
     print("done downloading");
     showProgress(false);
   }
@@ -118,6 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
         deleteItem(eves.l);
       }),);
     }
+    print('event list length: ${itemList.length}');
+
     showProgress(false);
     setState(() {
 
@@ -138,10 +158,10 @@ class _MyHomePageState extends State<MyHomePage> {
     String formattedDate=  DateFormat('YY:MM:dd').format(now);
 
     if(!(await uCheckInternet()) ){
-    showProgress(false);
-    uShowNoInternetDialog(context);
-    setListFromDb();
-    return;
+      showProgress(false);
+      uShowNoInternetDialog(context);
+      await setListFromDb();
+      return;
     }
     uSetPrefsValue('ldate', formattedDate);
     itemList=[];
