@@ -2,9 +2,10 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
-const kImageUrlStart='';
+const kImageUrlStart='https://firebasestorage.googleapis.com/v0/b/soccerevents-e5543.appspot.com/o/';
 
 Future<bool> uCheckInternet() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
@@ -15,7 +16,19 @@ Future<bool> uCheckInternet() async {
   }
   return false;
 }
-
+Future<void> uSetPrefsValue(String key, var value) async {
+  SharedPreferences sp=await SharedPreferences.getInstance();
+  if(sp.containsKey(key)){
+    await sp.remove(key);
+  }
+  await sp.reload();
+  await sp.setString(key, value.toString());
+  await sp.commit();
+}
+Future<dynamic> uGetSharedPrefValue(String key) async {
+  SharedPreferences sp=await SharedPreferences.getInstance();
+  return sp.get(key).toString();
+}
 void uShowNoInternetDialog(BuildContext context){
   uShowCustomDialog(context:context, icon: CupertinoIcons.cloud_bolt_rain, iconColor: Colors.grey,text:'No iternet connection. 😕');
 }

@@ -24,19 +24,21 @@ class EventItem extends StatelessWidget {
         }
       }
     }
+    if(srcImage==null||srcImage.isEmpty)
+      srcImage='';
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(8),
-      color: Colors.black.withOpacity(0.5),
+      color: Colors.blueGrey.withOpacity(0.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(srcImage, height: 100, fit: BoxFit.cover,),
+          Image.network(srcImage, height: srcImage.isEmpty?0:150,width: double.maxFinite, fit: BoxFit.cover,),
           SizedBox(height: 15,),
-          Text(data, style: TextStyle(color: Colors.white, fontSize: 20)),
+          Text(data, style: TextStyle(color: Colors.white, fontSize: 15)),
           SizedBox(height: 10,),
           FlatButton(
             onPressed: deleteItemFunc,

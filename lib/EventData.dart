@@ -15,7 +15,7 @@ class EventData{
     };
   }
 
-  EventData.fromMap(Map<String, String > map) {
+  EventData.fromMap(var map) {
     this.l=map['l'];
     this.e=map['e'];
   }
