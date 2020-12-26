@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:soccermgt/EventData.dart';
 
 import '../utilities.dart';
@@ -36,14 +37,18 @@ class ProposedEvent extends StatelessWidget {
           SizedBox(height: 10,),
           Row(
               children:[
-              ListButton(onPressed: onDeleleteItemFunc, text: "Delete", iconData: Icons.clear,),
-                ListButton(onPressed: onPushToMainFunc, text:"Approve", iconData: Icons.done,),
-                ListButton(text: "Contact",iconData: Icons.phone,onPressed: (){
-
-                },),
-                ListButton(text: "Email",iconData: Icons.send,onPressed: (){
-
-                },)
+              Expanded(child: ListButton(onPressed: onDeleleteItemFunc, text: "Delete", iconData: Icons.clear,)),
+                Expanded(child: ListButton(onPressed: onPushToMainFunc, text:"Approve", iconData: Icons.done,)),
+                Expanded(
+                  child: ListButton(text: "Contact",iconData: Icons.phone,onPressed: (){
+                    launch('tel:+${phoneNum}');
+                  },),
+                ),
+                Expanded(
+                  child: ListButton(text: "Email",iconData: Icons.send,onPressed: (){
+                    launch('mailto:${email}');
+                  },),
+                )
             ]
           ),
           SizedBox(height: 10,),
@@ -64,12 +69,12 @@ class ListButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      onPressed: onPressed,
+    return GestureDetector(
+      onTap: onPressed,
       child: Row(
         children: [
-          Icon(iconData, color: Colors.white,),
-          Text(text, style: TextStyle(color: Colors.white),)
+          Icon(iconData, color: Colors.white, size :12),
+          Text(text, style: TextStyle(color: Colors.white, fontSize :12),)
         ],
       ),
     );

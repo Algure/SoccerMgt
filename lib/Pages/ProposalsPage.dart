@@ -31,17 +31,27 @@ class _ProposalsState extends State<Proposals> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        backgroundColor: Colors.black,
+        title: Text("Soccer Mgt"),
+      ),
       body: ModalProgressHUD(
         inAsyncCall: progress,
-        child: Container(
-          color: Colors.black,
-          child: SmartRefresher(
-            onRefresh: (){
-              reDownloadProposals();
-            },
-            controller: _refreshController,
-            child: ListView(
-              children: downloadedProposals,
+        child: SafeArea(
+          child: Container(
+            color: Colors.black,
+            child: SmartRefresher(
+              onRefresh: (){
+                reDownloadProposals();
+              },
+              controller: _refreshController,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: downloadedProposals,
+                ),
+              ),
             ),
           ),
         ),
@@ -51,7 +61,7 @@ class _ProposalsState extends State<Proposals> {
           BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Events'),
           BottomNavigationBarItem(icon: Icon(Icons.mail), label: 'Proposals'),
         ],
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         currentIndex: 1,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
@@ -70,7 +80,10 @@ class _ProposalsState extends State<Proposals> {
     String formattedDate=  DateFormat('YY:MM:dd').format(now);
     if(!(await uCheckInternet()) ){
     showProgress(false);
-    setListFromDb();
+    await setListFromDb();
+    setState(() {
+
+    });
     return;
     }
     downloadedProposals=[];
@@ -81,24 +94,28 @@ class _ProposalsState extends State<Proposals> {
     Map<dynamic , dynamic> maps= Map.from(snapShot.value);
     ProposalsDB sDb = ProposalsDB();
     for (var key in maps.keys){
-    String eventDetails=maps[key];
-    downloadedProposals.add(ProposedEvent(data: eventDetails, id:key,onDeleleteItemFunc: (){
-    deleteItem(key);
-    },));
-    await sDb.insertItem(id: key, item: maps[key]);
+      String eventDetails=maps[key].toString();
+      downloadedProposals.add(ProposedEvent(data: eventDetails, id:key,onDeleleteItemFunc: (){
+        deleteItem(key);
+      },
+      onPushToMainFunc: (){
+        approveItem(key, eventDetails);
+      },
+      ));
+      await sDb.insertItem(id: key, item: maps[key].toString());
     }
     uSetPrefsValue('l2date', formattedDate);
     print("done downloading");
     showProgress(false);
   }
-  void downloadProposals() async {
 
+  void downloadProposals() async {
     showProgress(true);
     DateTime now= DateTime.now();
     String formattedDate=  DateFormat('YY:MM:dd').format(now);
     if(!(await uCheckInternet()) || ((await uGetSharedPrefValue('l2date')).toString())==formattedDate){
       showProgress(false);
-      setListFromDb();
+      await setListFromDb();
       return;
     }
     downloadedProposals=[];
@@ -109,11 +126,14 @@ class _ProposalsState extends State<Proposals> {
     Map<dynamic , dynamic> maps= Map.from(snapShot.value);
     ProposalsDB sDb = ProposalsDB();
     for (var key in maps.keys){
-      String eventDetails=maps[key];
+      String eventDetails=maps[key].toString();
       downloadedProposals.add(ProposedEvent(data: eventDetails, id:key,onDeleleteItemFunc: (){
         deleteItem(key);
-      },));
-      await sDb.insertItem(id: key, item: maps[key]);
+      },
+        onPushToMainFunc: (){
+          approveItem(key, eventDetails);
+        },));
+      await sDb.insertItem(id: key, item: maps[key].toString());
     }
     uSetPrefsValue('l2date', formattedDate);
     print("done downloading");
@@ -135,7 +155,10 @@ class _ProposalsState extends State<Proposals> {
     for(EventData eves in eventsList){
       downloadedProposals.add(ProposedEvent(data: eves.e, id:eves.l,onDeleleteItemFunc: (){
         deleteItem(eves.l);
-      },));
+      },
+        onPushToMainFunc: (){
+          approveItem(eves.l, eves.e);
+        },));
     }
     showProgress(false);
     setState(() {
@@ -198,6 +221,67 @@ class _ProposalsState extends State<Proposals> {
     showProgress(true);
     await FirebaseDatabase.instance.reference().child('Prop').child(key).remove();
     print('DELETED+');
+    ProposalsDB sDb = ProposalsDB();
+    await sDb.deleteItem(key);
+    setListFromDb();
+  }
+
+  Future<void> approveItem(String key, String details) async {
+    if(!(await uCheckInternet())){
+      uShowNoInternetDialog(context);
+      return;
+    }
+    uShowApproveDialog(key:key, details: details);
+  }
+  void uShowApproveDialog({String key, String details}){
+    List<Widget> butList=[];
+    Dialog errorDialog= Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      backgroundColor: Colors.black,
+      child: Container(
+        height: 350,
+        child: Column(
+          children: [
+            Expanded(child: Icon(Icons.approval, color: Colors.green, size: 200,)),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('This event would be made public on the app.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+            ),
+            SizedBox(height: 20,),
+            Container(
+                height: butList!=null?50:2,
+                padding: EdgeInsets.all(8.0),
+                child: MyButton(text: 'Proceed', buttonColor: Colors.green, textColor: Colors.white, onPressed: (){
+                  Navigator.pop(context);
+                  realApproveItem(key, details);
+                },)
+            )
+          ],
+        ),
+      ),
+    );
+    showGeneralDialog(context: context,
+        barrierLabel: 'iugisss',
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.5),
+        transitionDuration: Duration(milliseconds: 500),
+        transitionBuilder: (_, anim, __, child){
+          return SlideTransition(position: Tween(begin: Offset(-1,0), end: Offset(0,0)).animate(anim), child: child,);
+        },
+        pageBuilder: (BuildContext context, _, __)=>(errorDialog)
+    );
+  }
+  void realApproveItem(String key, String details) async{
+    if(!(await uCheckInternet())){
+      uShowNoInternetDialog(context);
+      return;
+    }
+    List<String> detailsList= details.split(':')[1].replaceAll('"', '').split('<');
+    print('key2delete: '+key);
+    showProgress(true);
+    await FirebaseDatabase.instance.reference().child('Eve').child(key).set('<'+detailsList[0].trim());
+    await FirebaseDatabase.instance.reference().child('Prop').child(key).remove();
+    print('Published');
     ProposalsDB sDb = ProposalsDB();
     await sDb.deleteItem(key);
     setListFromDb();

@@ -57,8 +57,10 @@ class _MyHomePageState extends State<MyHomePage> {
                reDownloadItems();
              },
             controller: _refreshController,
-            child: ListView(
-              children: itemList
+            child: SingleChildScrollView(
+              child: Column(
+                children: itemList
+              ),
             ),
           ),
         ),
@@ -68,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Events'),
           BottomNavigationBarItem(icon: Icon(Icons.mail), label: 'Proposals'),
         ],
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         currentIndex: 0,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
@@ -101,7 +103,6 @@ class _MyHomePageState extends State<MyHomePage> {
     OnlineEventsDb sDb = OnlineEventsDb();
     for (var key in maps.keys){
       String eventDetails=maps[key];
-
       if(eventDetails.startsWith('<')){
         itemList.add(EventItem(data: eventDetails.substring(1), id:key,deleteItemFunc: (){
           deleteItem(key);
@@ -120,9 +121,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void showProgress(bool b) {
-    progress=b;
-    _refreshController.refreshCompleted();
+
     setState(() {
+      progress=b;
+      _refreshController.refreshCompleted();
     });
   }
 
@@ -137,11 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }),);
     }
     print('event list length: ${itemList.length}');
-
     showProgress(false);
-    setState(() {
-
-    });
   }
 
   Future<void> deleteItem(String key) async {
@@ -159,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if(!(await uCheckInternet()) ){
       showProgress(false);
-      uShowNoInternetDialog(context);
+//      uShowNoInternetDialog(context);
       await setListFromDb();
       return;
     }
@@ -175,14 +173,14 @@ class _MyHomePageState extends State<MyHomePage> {
     String eventDetails=maps[key];
 
     if(eventDetails.startsWith('<')){
-    itemList.add(EventItem(data: eventDetails.substring(1), id:key,deleteItemFunc: (){
-    deleteItem(key);
+      itemList.add(EventItem(data: eventDetails.substring(1), id:key,deleteItemFunc: (){
+      deleteItem(key);
     },));
     }else{
     List<String> eventD=eventDetails.split('<');
-    itemList.add(EventItem(data: eventD[1], id: key , srcImage: kImageUrlStart+eventD[0],deleteItemFunc: (){
-    deleteItem(key);
-    }));
+      itemList.add(EventItem(data: eventD[1], id: key , srcImage: kImageUrlStart+eventD[0],deleteItemFunc: (){
+        deleteItem(key);
+      }));
     }
     await sDb.insertItem(id: key, item: maps[key]);
     }

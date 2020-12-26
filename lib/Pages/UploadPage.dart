@@ -35,7 +35,17 @@ class _UploadPageState extends State<UploadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      appBar: AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        backgroundColor: Colors.white,
+        title: Text("Upload Event", style: TextStyle(color:Colors.black),),
+        leading: FlatButton(
+            onPressed: (){
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.keyboard_backspace, color: Colors.black,)),
+      ),
       body: ModalProgressHUD(
         inAsyncCall: progress,
         child: Padding(
@@ -46,12 +56,6 @@ class _UploadPageState extends State<UploadPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 10,),
-                FlatButton(
-                    onPressed: (){
-                      Navigator.pop(context);
-                    },
-                    child: Icon(Icons.keyboard_backspace, color: Colors.black,)),
-                SizedBox(height: 50,),
                 Container(
                     decoration: BoxDecoration(
                       border: Border.all(),
