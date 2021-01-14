@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:soccermgt/TeamDataObject.dart';
 import 'package:soccermgt/utilities.dart';
 
 import '../constants.dart';
 
 class TeamWidget extends StatelessWidget {
 
-  String teamData;
+  TeamData teamData;
   Function onDeletePressed;
 
   String teamName;
@@ -19,7 +20,7 @@ class TeamWidget extends StatelessWidget {
   String teamLogo;
 
   TeamWidget({this.teamData, this.onDeletePressed}){
-    setupTeamData(teamData);
+    setupTeamData(teamData.e);
   }
 
   @override

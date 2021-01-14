@@ -25,7 +25,8 @@ import 'package:soccermgt/utilities.dart';
 
 class UploadPage extends StatefulWidget {
   BuildContext oldContext;
-  UploadPage(this.oldContext);
+  String uploadHook;
+  UploadPage(this.oldContext, {this.uploadHook="News"});
   @override
   _UploadPageState createState() => _UploadPageState();
 }
@@ -312,65 +313,6 @@ class _UploadPageState extends State<UploadPage> {
   setupDisplayFormatList(){
      eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,clickLink: clickLink);
 
-//    DisplayFormatsList=[
-//      ImageLongWidget(eventsObject, onFormatSelected: (){
-//          EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
-//        selectedWidget=ImageLongWidget(eventsObject);
-//        setState(() {
-//
-//        });
-//      },),
-//      ImageLongWithTextWidget(eventsObject, onFormatSelected: (){
-//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
-//        selectedWidget=ImageLongWithTextWidget(eventsObject);
-//        setState(() {
-//
-//        });
-//      },),
-//      ImageShort(eventsObject, onFormatSelected: (){
-//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
-//        selectedWidget=ImageShort(eventsObject);
-//        setState(() {
-//
-//        });
-//      },),
-//      ImageSquare(eventsObject,  onFormatSelected: (){
-//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
-//        selectedWidget=ImageSquare(eventsObject);
-//        setState(() {
-//
-//        });
-//      },),
-//      ImageTextDescriptionWidget(eventsObject, onFormatSelected: (){
-//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
-//        selectedWidget=ImageTextDescriptionWidget(eventsObject);
-//        setState(() {
-//
-//        });
-//      },),
-//      ImageTransText(eventsObject, onFormatSelected: (){
-//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
-//        selectedWidget=ImageTransText(eventsObject);
-//        setState(() {
-//
-//        });
-//      },),
-//      ImageTransTextDown(eventsObject,  onFormatSelected: (){
-//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
-//        selectedWidget=ImageTransTextDown(eventsObject);
-//        setState(() {
-//
-//        });
-//      },),
-//      ImageTransTextUpWidget(eventsObject,
-//        onFormatSelected: (){
-//          EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
-//          selectedWidget=ImageTransTextUpWidget(eventsObject);
-//          setState(() {
-//
-//          });
-//        },),
-//    ];
   }
 
   selectImage() async {
@@ -499,11 +441,10 @@ class _UploadPageState extends State<UploadPage> {
     }
     print('picUrl= $picUrl');
     uploadPack+='<'+description;
-
     EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,clickLink: clickLink);
     eventsObject.imageUrl=picUrl;
     print('upload pack: ${eventsObject.toString()}');
-    await FirebaseDatabase.instance.reference().child('News').child(getUniqueId()).set(eventsObject.toString());
+    await FirebaseDatabase.instance.reference().child('${widget.uploadHook}').child(getUniqueId()).set(eventsObject.toString());
     showProgress(false);
     Navigator.pop(context);
     showItemUploadedDialog(widget.oldContext);
