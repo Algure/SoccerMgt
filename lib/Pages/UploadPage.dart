@@ -10,6 +10,16 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:soccermgt/EventsObject.dart';
+import 'package:soccermgt/constants.dart';
+import 'package:soccermgt/customViews/ImageLong.dart';
+import 'package:soccermgt/customViews/ImageLongWithText.dart';
+import 'package:soccermgt/customViews/ImageShort.dart';
+import 'package:soccermgt/customViews/ImageSquare.dart';
+import 'package:soccermgt/customViews/ImageTextDescriptionWidget.dart';
+import 'package:soccermgt/customViews/ImageTransText.dart';
+import 'package:soccermgt/customViews/ImageTransTextDown.dart';
+import 'package:soccermgt/customViews/ImageTransTextUp.dart';
 import 'file:///C:/FlutterProjects/SoccerMgt/flutter_app/lib/customViews/my_button.dart';
 import 'package:soccermgt/utilities.dart';
 
@@ -31,6 +41,36 @@ class _UploadPageState extends State<UploadPage> {
   String filePath;
   String description='';
   String downloadUrl;
+  List<Widget> DisplayFormatsList=[];
+
+  String title="";
+
+  String widgetType="";
+
+  String clickLink="";
+
+  Widget selectedWidget;
+
+  EventsObject eventsObject;
+
+  FocusNode linkNode=FocusNode();
+  FocusNode titleNode=FocusNode();
+  FocusNode descriptionNode=FocusNode();
+
+
+  @override
+  void initState() {
+    setupDisplayFormatList();
+    linkNode.addListener(() {
+      setupDisplayFormatList2();
+    });
+    titleNode.addListener(() {
+      setupDisplayFormatList2();
+    });
+    descriptionNode.addListener(() {
+      setupDisplayFormatList2();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,80 +86,291 @@ class _UploadPageState extends State<UploadPage> {
             },
             child: Icon(Icons.keyboard_backspace, color: Colors.black,)),
       ),
+
       body: ModalProgressHUD(
         inAsyncCall: progress,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 10,),
-                Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: BorderRadius.all(Radius.circular(10))
 
-                    ),
-                    child: Image.file(file,  height: 250, width: double.maxFinite, fit: BoxFit.cover,)
-                ),
-                Container(
-                  height: 50,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: MyButton(text: 'Select Image', buttonColor: Colors.blue, onPressed: (){
-                          selectImage();
-                        }),
+            child: Container(
+              color: Color(0xffdddddd),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 10,width: double.infinity,),
+                  Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.all(Radius.circular(10))
+
                       ),
-                      Expanded(
-                        child: MyButton(text: 'Remove Image', buttonColor: Colors.red, onPressed: (){
-                          filePath="";
-                          file=File('');
+                      child: Image.file(file,  height: 250, width: double.maxFinite, fit: BoxFit.cover,)
+                  ),
+                  Container(
+                    height: 50,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: MyButton(text: 'Select Image', buttonColor: Colors.blue, onPressed: (){
+                            selectImage();
+                          }),
+                        ),
+                        Expanded(
+                          child: MyButton(text: 'Remove Image', buttonColor: Colors.red, onPressed: (){
+                            filePath="";
+                            file=File('');
+                            setState(() {
+
+                            });
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 20,width: double.infinity),
+                  TextField(
+                      controller: TextEditingController(
+                          text: title
+                      ),
+                      style: TextStyle(color: Colors.black),
+                      textAlign: TextAlign.start,
+                      onChanged: (text){title=text;},
+                      maxLines:2,
+                      focusNode: titleNode,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Enter title of event',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 1.5
+                              )),
+                      )
+                  ),
+                  SizedBox(height: 20,width: double.infinity),
+                  TextField(
+                      controller: TextEditingController(
+                          text: description
+                      ),
+                      style: TextStyle(color: Colors.black),
+                      textAlign: TextAlign.start,
+                      focusNode: descriptionNode,
+                      onChanged: (text){description=text;},
+                      maxLines:6,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Enter details of event with links.',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 1.5
+                              )),
+                      )
+                  ),
+                  SizedBox(height: 20,width: double.infinity),
+                  TextField(
+                      controller: TextEditingController(
+                          text: clickLink
+                      ),
+                      focusNode: linkNode,
+                      style: TextStyle(color: Colors.black),
+                      textAlign: TextAlign.start,
+                      onChanged: (text){clickLink=text;},
+                      maxLines:2,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: 'Enter link for event click',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 1.5
+                              )),
+                      )
+                  ),
+                  SizedBox(height: 5),
+                  Text("Select Display format", style: TextStyle(color: Colors.black),),
+                  SizedBox(height: 5),
+                  Container(
+                    height: kWidgetWidth*2,
+                    width: double.infinity,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          ImageLongWidget(eventsObject, onFormatSelected: (){
+                            EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+                            widgetType="0";
+                            selectedWidget=ImageLongWidget(eventsObject);
+                            setState(() {
+
+                            });
+                          },),
+                        SizedBox(width: 20,),
+                        ImageLongWithTextWidget(eventsObject, onFormatSelected: (){
+                          EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType, clickLink: clickLink);
+                          widgetType="1";
+                          selectedWidget=ImageLongWithTextWidget(eventsObject);
                           setState(() {
 
                           });
-                        }),
+                        },),
+                          SizedBox(width: 10,),
+                          ImageShort(eventsObject, onFormatSelected: (){
+                          EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType, clickLink: clickLink);
+                          widgetType="2";
+                          selectedWidget=ImageShort(eventsObject);
+                          setState(() {
+
+                          });
+                        },),
+                          SizedBox(width: 10,),
+                          ImageSquare(eventsObject,  onFormatSelected: (){
+                        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+                        widgetType="3";
+                        selectedWidget=ImageSquare(eventsObject);
+                        setState(() {
+
+                        });
+                      },),
+                          SizedBox(width: 10,),
+                          ImageTextDescriptionWidget(eventsObject, onFormatSelected: (){
+                        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+                        widgetType="4";
+                        selectedWidget=ImageTextDescriptionWidget(eventsObject);
+                        setState(() {
+
+                        });
+                      },),
+                          SizedBox(width: 10,),
+                          ImageTransText(eventsObject, onFormatSelected: (){
+                        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+                        widgetType="5";
+                        selectedWidget=ImageTransText(eventsObject);
+                        setState(() {
+
+                        });
+                      },),
+                          SizedBox(width: 10,),
+                          ImageTransTextDown(eventsObject,  onFormatSelected: (){
+                        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+                        widgetType="6";
+                        selectedWidget=ImageTransTextDown(eventsObject);
+                        setState(() {
+
+                        });
+                      },),
+                          SizedBox(width: 10,),
+                          ImageTransTextUpWidget(eventsObject,
+                        onFormatSelected: (){
+                          EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+                          widgetType="7";
+                          selectedWidget=ImageTransTextUpWidget(eventsObject);
+                          setState(() {
+
+                          });
+                        },),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 20,),
-                TextField(
-                    controller: TextEditingController(
-                        text: description
                     ),
-                    style: TextStyle(color: Colors.black),
-                    textAlign: TextAlign.start,
-                    onChanged: (text){description=text;},
-                    maxLength: 120,
-                    maxLines:10,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Enter details of event with links.',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            borderSide: BorderSide(
-                                color: Colors.black,
-                                width: 1.5
-                            )),
-                    )
-                ),
-                SizedBox(height: 20,),
+                  ),
+                  Container(
+                      color: Colors.transparent,
+                      child:selectedWidget??Container()),
+                  SizedBox(height: 20),
 
-                MyButton(text: 'Upload', onPressed: (){
-                  showUploadPreviewDialog();
-                })
-              ],
+                  MyButton(text: 'Upload', onPressed: (){
+                    showUploadPreviewDialog();
+                  })
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  void setupDisplayFormatList2() {
+    eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,clickLink: clickLink);
+    setState(() {
+
+    });
+  }
+
+  setupDisplayFormatList(){
+     eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,clickLink: clickLink);
+
+//    DisplayFormatsList=[
+//      ImageLongWidget(eventsObject, onFormatSelected: (){
+//          EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+//        selectedWidget=ImageLongWidget(eventsObject);
+//        setState(() {
+//
+//        });
+//      },),
+//      ImageLongWithTextWidget(eventsObject, onFormatSelected: (){
+//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+//        selectedWidget=ImageLongWithTextWidget(eventsObject);
+//        setState(() {
+//
+//        });
+//      },),
+//      ImageShort(eventsObject, onFormatSelected: (){
+//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+//        selectedWidget=ImageShort(eventsObject);
+//        setState(() {
+//
+//        });
+//      },),
+//      ImageSquare(eventsObject,  onFormatSelected: (){
+//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+//        selectedWidget=ImageSquare(eventsObject);
+//        setState(() {
+//
+//        });
+//      },),
+//      ImageTextDescriptionWidget(eventsObject, onFormatSelected: (){
+//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+//        selectedWidget=ImageTextDescriptionWidget(eventsObject);
+//        setState(() {
+//
+//        });
+//      },),
+//      ImageTransText(eventsObject, onFormatSelected: (){
+//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+//        selectedWidget=ImageTransText(eventsObject);
+//        setState(() {
+//
+//        });
+//      },),
+//      ImageTransTextDown(eventsObject,  onFormatSelected: (){
+//        EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+//        selectedWidget=ImageTransTextDown(eventsObject);
+//        setState(() {
+//
+//        });
+//      },),
+//      ImageTransTextUpWidget(eventsObject,
+//        onFormatSelected: (){
+//          EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,        clickLink: clickLink);
+//          selectedWidget=ImageTransTextUpWidget(eventsObject);
+//          setState(() {
+//
+//          });
+//        },),
+//    ];
   }
 
   selectImage() async {
@@ -129,6 +380,7 @@ class _UploadPageState extends State<UploadPage> {
     String compressedPath= await compressImage(File(tempFile.path).absolute.path);
     filePath=compressedPath;
     file=File(filePath);
+    setupDisplayFormatList2();
     showProgress(false);
   }
 
@@ -222,18 +474,36 @@ class _UploadPageState extends State<UploadPage> {
 
   Future<void> startUploadSequence() async {
     String uploadPack='';
+    if((title==null||title.trim().isEmpty)&&
+    (description==null||description.trim().isEmpty)&&
+    (filePath==null||filePath.trim().isEmpty)&&
+    (widgetType==null||widgetType.trim().isEmpty)&&
+    (clickLink==null||clickLink.trim().isEmpty))
+    {
+      uShowErrorDialog(context, "Insufficient details");
+      return;
+    }
+    if( (widgetType==null||widgetType.trim().isEmpty)){
+      uShowErrorDialog(context, "You must select a widget type");
+      return;
+    }
     showProgress(true);
     if(!(await uCheckInternet())){
       uShowNoInternetDialog(context);
       showProgress(false);
       return;
     }
+    String picUrl="";
     if(filePath!=null && filePath.trim().isNotEmpty){
-      uploadPack+= await uploadPicsGetUrl();
+      picUrl = await uploadPicsGetUrl();
     }
+    print('picUrl= $picUrl');
     uploadPack+='<'+description;
-    print('upload pack: $uploadPack');
-    await FirebaseDatabase.instance.reference().child('Eve').child(getUniqueId()).set(uploadPack);
+
+    EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,clickLink: clickLink);
+    eventsObject.imageUrl=picUrl;
+    print('upload pack: ${eventsObject.toString()}');
+    await FirebaseDatabase.instance.reference().child('News').child(getUniqueId()).set(eventsObject.toString());
     showProgress(false);
     Navigator.pop(context);
     showItemUploadedDialog(widget.oldContext);
@@ -242,4 +512,5 @@ class _UploadPageState extends State<UploadPage> {
   void showItemUploadedDialog(BuildContext context) {
     uShowCustomDialog(context:context,icon: Icons.done, iconColor: Colors.green, text: 'Event has been uploaded');
   }
+
 }

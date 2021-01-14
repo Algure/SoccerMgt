@@ -1,7 +1,7 @@
 class EventData{
 
   String l;// item id
-  String e;// item emails
+  String e;// item details
 
 
   EventData.withDetails(this.l, this.e){

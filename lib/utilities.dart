@@ -32,6 +32,11 @@ Future<dynamic> uGetSharedPrefValue(String key) async {
 void uShowNoInternetDialog(BuildContext context){
   uShowCustomDialog(context:context, icon: CupertinoIcons.cloud_bolt_rain, iconColor: Colors.grey,text:'No iternet connection. 😕');
 }
+
+void uShowErrorDialog(BuildContext context, String errorText){
+  uShowCustomDialog(context: context, icon:Icons.warning, iconColor: Colors.red, text: errorText );
+}
+
 void uShowCustomDialog({BuildContext context, IconData icon, Color iconColor, String text, List buttonList}){
   List<Widget> butList=[];
   if(buttonList!=null && buttonList.length>0){

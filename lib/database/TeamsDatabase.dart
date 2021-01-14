@@ -4,14 +4,14 @@ import 'package:path/path.dart';
 import 'package:soccermgt/EventData.dart';
 import 'package:sqflite/sqflite.dart';
 
-class OnlineEventsDb{
+class TeamsDb{
 
   Future<Database> createDatabase() async {
     return await openDatabase(
-      join(await getDatabasesPath(), 'doggie_database.db'),
+      join(await getDatabasesPath(), 'doggieteam_database.db'),
       onCreate: (db, version) {
         return db.execute(
-          "CREATE TABLE OnlineEvents(l TEXT PRIMARY KEY, e TEXT)",);
+          "CREATE TABLE Teams(l TEXT PRIMARY KEY, e TEXT)",);
       },
       version: 1,);
   }
@@ -21,7 +21,7 @@ class OnlineEventsDb{
     final Database db = await createDatabase();
     EventData ed=EventData.withDetails(id, item);
     await db.insert(
-      'OnlineEvents',
+      'Teams',
       ed.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -33,7 +33,7 @@ class OnlineEventsDb{
 
     // Remove the Dog from the Database.
     await db.delete(
-      'OnlineEvents',
+      'Teams',
       // Use a `where` clause to delete a specific dog.
       where: "l = ?",
       // Pass the Dog's id as a whereArg to prevent SQL injection.
@@ -47,7 +47,7 @@ class OnlineEventsDb{
 
     // Remove the Dog from the Database.
     final List<Map<String, dynamic>> maps = await db.query(
-      'OnlineEvents',
+      'Teams',
       // Use a `where` clause to check a specific dog.
       where: "l = ?",
       whereArgs: [id],
@@ -68,7 +68,7 @@ class OnlineEventsDb{
     final Database db = await createDatabase();
 
     // Query the table for all The Itemss.
-    final List<Map<String, dynamic>> maps = await db.query('OnlineEvents');
+    final List<Map<String, dynamic>> maps = await db.query('Teams');
 
     // Convert the List<Map<String, dynamic> into a List<MartItem>.
     return List.generate(maps.length, (i) {
@@ -81,7 +81,7 @@ class OnlineEventsDb{
     final Database db = await createDatabase();
 
     // Query the table for all The Itemss.
-    final List<Map<String, dynamic>> maps = await db.query('OnlineEvents');
+    final List<Map<String, dynamic>> maps = await db.query('Teams');
 
     // Convert the List<Map<String, dynamic> into a List<MartItem>.
     return List.generate(maps.length, (i) {
