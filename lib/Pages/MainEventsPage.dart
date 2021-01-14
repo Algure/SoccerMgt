@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soccermgt/EventData.dart';
 import 'package:soccermgt/Pages/LoginPage.dart';
 import 'package:soccermgt/Pages/ProposalsPage.dart';
+import 'package:soccermgt/Pages/TeamsPage.dart';
 import 'package:soccermgt/customViews/ImageLong.dart';
 import 'package:soccermgt/customViews/ImageLongWithText.dart';
 import 'package:soccermgt/customViews/ImageShort.dart';
@@ -87,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Events'),
-          BottomNavigationBarItem(icon: Icon(Icons.shield), label: 'Proposals'),
+          BottomNavigationBarItem(icon: Icon(Icons.shield), label: 'Teams'),
+          BottomNavigationBarItem(icon: Icon(Icons.sports_volleyball), label: 'Tournament'),
         ],
         backgroundColor: Colors.black,
         currentIndex: 0,
@@ -95,6 +97,9 @@ class _MyHomePageState extends State<MyHomePage> {
         unselectedItemColor: Colors.grey,
         onTap: (dex){
           if(dex==1){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>TeamsPage()));
+          }
+          else if(dex==2){
             Navigator.push(context, MaterialPageRoute(builder: (context)=>Proposals()));
           }
         },

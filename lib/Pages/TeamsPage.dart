@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:intl/intl.dart';
+import 'package:soccermgt/Pages/TeamDataPage.dart';
 import 'package:soccermgt/Pages/UploadTeamPage.dart';
 import 'package:soccermgt/customViews/TeamWidget.dart';
 import 'package:soccermgt/customViews/my_button.dart';
@@ -73,7 +74,6 @@ class _TeamsPageState extends State<TeamsPage> {
           }
         },
       ),
-
     );
   }
 
@@ -102,11 +102,14 @@ class _TeamsPageState extends State<TeamsPage> {
       await sDb.insertItem(id: key, item: maps[key].toString());
       String eventDetails=maps[key];
       try {
-
-          itemList.add(TeamWidget( teamData:maps[key].toString(),onDeletePressed: (){
-            deleteItem(key.toString());
+          itemList.add(TeamWidget( teamData:maps[key].toString(),
+              onTeamPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>TeamDataPage(teamName: eventDetails.split('<')[0] ,teamId: key.toString(),)));
+              }
+              ,onDeletePressed:
+              (){
+              deleteItem(key.toString());
           },));
-
       }catch(e){
         print("Event add exception ${e.toString()}");
       }
@@ -115,7 +118,6 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   void showProgress(bool b) {
-
     setState(() {
       progress=b;
       _refreshController.refreshCompleted();
@@ -129,10 +131,14 @@ class _TeamsPageState extends State<TeamsPage> {
     List<EventData> eventsList=await sDb.getEvents();
     for(EventData eves in eventsList){
       try {
-        itemList.add(TeamWidget( teamData:eves.e,onDeletePressed: (){
-          deleteItem(eves.l);
-        },));
-
+        itemList.add(TeamWidget( teamData:eves.e,
+            onTeamPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>TeamDataPage(teamName: eves.e.split('<')[0]
+                ,teamId: eves.l.toString(),)));
+            },
+          onDeletePressed: (){
+            deleteItem(eves.l);
+          },));
       }catch(e){
         print("Event add exception ${e.toString()}");
       }
@@ -173,17 +179,20 @@ class _TeamsPageState extends State<TeamsPage> {
       await sDb.insertItem(id: key, item: maps[key].toString());
       String eventDetails=maps[key];
       try {
-
-        itemList.add(TeamWidget( teamData:maps[key].toString(),onDeletePressed: (){
+        itemList.add(TeamWidget( teamData:maps[key].toString(),
+            onTeamPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>TeamDataPage(teamName: eventDetails.split('<')[0]
+                ,teamId: key.toString(),)));
+            },onDeletePressed: (){
           deleteItem(key.toString());
         },));
-
       }catch(e){
         print("Event update exception ${e.toString()}");
       }
     }
     showProgress(false);
   }
+
   displayAboutDialog(){
     Navigator.pop(context);
     showAboutDialog(
@@ -192,9 +201,9 @@ class _TeamsPageState extends State<TeamsPage> {
       applicationLegalese: 'Brought to you by Cyber-Techies',
       applicationVersion: '1.0.0',
       applicationIcon:Container(child: Icon(Icons.sports_volleyball,size: 70, color: Colors.deepPurple,),),
-
     );
   }
+
   void uShowDeleteDialog({String key}){
     List<Widget> butList=[];
     Dialog errorDialog= Dialog(

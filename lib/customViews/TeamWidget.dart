@@ -6,8 +6,9 @@ import '../constants.dart';
 
 class TeamWidget extends StatelessWidget {
 
-  TeamData teamData;
+  String teamData;
   Function onDeletePressed;
+  Function onTeamPressed;
 
   String teamName;
 
@@ -19,27 +20,32 @@ class TeamWidget extends StatelessWidget {
 
   String teamLogo;
 
-  TeamWidget({this.teamData, this.onDeletePressed}){
-    setupTeamData(teamData.e);
+  TeamWidget({this.teamData, this.onDeletePressed, this.onTeamPressed}){
+    setupTeamData(teamData);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: ListTile(
-        leading: Image.network(kImageUrlStart+teamLogo, height: 70, width: 70,),
-        title: Text(teamName, style: kTitleStyle,),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('speed:$teamSpeed%', style: kSubtitleStyle,),
-            Text('shot:$teamShot%', style: kSubtitleStyle,),
-            Text('power:$teamPower%', style: kSubtitleStyle,),
-          ],
-        ),
-        trailing: GestureDetector(
-          onTap: onDeletePressed??(){},
-          child: Text('Delete', style: TextStyle(color: Colors.red),),
+      child: GestureDetector(
+        onTap: onTeamPressed??(){
+
+        },
+        child: ListTile(
+          leading: Image.network(kImageUrlStart+teamLogo, height: 70, width: 70,),
+          title: Text(teamName, style: kTitleStyle,),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('speed:$teamSpeed%', style: kSubtitleStyle,),
+              Text('shot:$teamShot%', style: kSubtitleStyle,),
+              Text('power:$teamPower%', style: kSubtitleStyle,),
+            ],
+          ),
+          trailing: GestureDetector(
+            onTap: onDeletePressed??(){},
+            child: Text('Delete', style: TextStyle(color: Colors.red),),
+          ),
         ),
       ),
     );
