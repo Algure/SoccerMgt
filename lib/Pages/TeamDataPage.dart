@@ -50,21 +50,21 @@ class _TeamDataPageState extends State<TeamDataPage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        backgroundColor: Colors.black,
-        title: Text(widget.teamName??'Team'),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.black, ),
+        title: Text(widget.teamName+' data'??'Team', style: TextStyle(color: Colors.black),),
         actions: [
-          Expanded(child: SizedBox(),),
           FlatButton(
               onPressed: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>UploadPage(context,uploadHook: widget.teamId,)));
               },
-              child: Icon(Icons.add, color: Colors.white,)),
+              child: Icon(Icons.add, color: Colors.black,)),
         ],
       ),
       body: ModalProgressHUD(
         inAsyncCall: progress,
         child: Container(
-          color: Colors.black,
+          color: Color(0xFFEEEEEE),
           child: SmartRefresher(
             onRefresh: (){
               reDownloadItems();
@@ -106,7 +106,7 @@ class _TeamDataPageState extends State<TeamDataPage> {
     TeamsDataDb sDb = TeamsDataDb();
 
     for (var key in maps.keys){
-      TeamData teamData=TeamData.fromMap(maps[key]);
+      TeamData teamData=TeamData.fromFirebase(itemId:key, teamId:widget.teamId, map:maps[key].toString());
       await sDb.insertItem(id: key, teamData: teamData);
       try{
         String eventDetails=teamData.e;
@@ -243,9 +243,10 @@ class _TeamDataPageState extends State<TeamDataPage> {
     TeamsDataDb sDb = TeamsDataDb();
 
     for (var key in maps.keys){
-      TeamData teamData=TeamData.fromMap(maps[key]);
-      await sDb.insertItem(id: key, teamData: teamData);
+
       try{
+        TeamData teamData=TeamData.fromFirebase(itemId:key, teamId:widget.teamId, map:maps[key].toString());
+        await sDb.insertItem(id: key, teamData: teamData);
         String eventDetails=teamData.e;
         try {
           EventsObject eveOb = EventsObject.fromString(eventDetails);
@@ -291,6 +292,7 @@ class _TeamDataPageState extends State<TeamDataPage> {
     }
     showProgress(false);
   }
+
   displayAboutDialog(){
     Navigator.pop(context);
     showAboutDialog(
@@ -302,6 +304,7 @@ class _TeamDataPageState extends State<TeamDataPage> {
 
     );
   }
+
   void uShowDeleteDialog({String key}){
     List<Widget> butList=[];
     Dialog errorDialog= Dialog(
@@ -340,7 +343,6 @@ class _TeamDataPageState extends State<TeamDataPage> {
         pageBuilder: (BuildContext context, _, __)=>(errorDialog)
     );
   }
-
 
   void realDeleteItem(String key) async{
     if(!(await uCheckInternet())){

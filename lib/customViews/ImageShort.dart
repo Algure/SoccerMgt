@@ -25,6 +25,7 @@ class ImageShort extends StatelessWidget {
       child: Container(
         height: kWidgetWidth*0.6+(isFromNetwork?50:0),
         color: Colors.white,
+        margin: EdgeInsets.all(3),
         width: kWidgetWidth,
         child: Column(
           children: [

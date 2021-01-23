@@ -8,6 +8,7 @@ import 'package:soccermgt/EventData.dart';
 import 'package:soccermgt/Pages/LoginPage.dart';
 import 'package:soccermgt/Pages/ProposalsPage.dart';
 import 'package:soccermgt/Pages/TeamsPage.dart';
+import 'package:soccermgt/Pages/TournamentsPage.dart';
 import 'package:soccermgt/customViews/ImageLong.dart';
 import 'package:soccermgt/customViews/ImageLongWithText.dart';
 import 'package:soccermgt/customViews/ImageShort.dart';
@@ -17,6 +18,7 @@ import 'package:soccermgt/customViews/ImageTransText.dart';
 import 'package:soccermgt/customViews/ImageTransTextDown.dart';
 import 'package:soccermgt/customViews/ImageTransTextUp.dart';
 import '../EventsObject.dart';
+import 'FantasyDataPage.dart';
 import 'file:///C:/FlutterProjects/SoccerMgt/flutter_app/lib/Pages/UploadPage.dart';
 import 'package:soccermgt/customViews/my_button.dart';
 import 'package:soccermgt/utilities.dart';
@@ -51,26 +53,26 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        backgroundColor: Colors.black,
-        title: Text(widget.title),
+        backgroundColor: Colors.white,
+
+        title: Text('News', style: TextStyle(color: Colors.black, fontSize: 16),),
         actions: [
-          Expanded(child: SizedBox(),),
           FlatButton(
               onPressed: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>UploadPage(context)));
               },
-              child: Icon(Icons.add, color: Colors.white,)),
+              child: Icon(Icons.add, color: Colors.black,)),
           FlatButton(
               onPressed: (){
                 displayAboutDialog();
                 },
-              child: Icon(Icons.info_outline, color: Colors.white,))
+              child: Icon(Icons.info_outline, color: Colors.black,))
         ],
       ),
       body: ModalProgressHUD(
         inAsyncCall: progress,
         child: Container(
-            color: Colors.black,
+            color: Color(0xFFEEEEEE),
             child: SmartRefresher(
              onRefresh: (){
                reDownloadItems();
@@ -87,20 +89,31 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Events'),
+          BottomNavigationBarItem(icon: Icon(Icons.description), label: 'News'),
           BottomNavigationBarItem(icon: Icon(Icons.shield), label: 'Teams'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_volleyball), label: 'Tournament'),
+          BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: 'Tournament'),
+          BottomNavigationBarItem(icon: Icon(Icons.sports_volleyball), label: 'Fantasy'),
         ],
         backgroundColor: Colors.black,
         currentIndex: 0,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
         onTap: (dex){
+          if(dex==0){
+            Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomePage()));
+          }
           if(dex==1){
+            Navigator.pop(context);
             Navigator.push(context, MaterialPageRoute(builder: (context)=>TeamsPage()));
           }
           else if(dex==2){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>Proposals()));
+            Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>TournamentPage()));
+          }
+          else if(dex==3){
+            Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>FantasyDataPage()));
           }
         },
       ),
@@ -361,6 +374,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     showProgress(false);
   }
+
   displayAboutDialog(){
     Navigator.pop(context);
     showAboutDialog(
@@ -372,6 +386,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     );
   }
+
   void uShowDeleteDialog({String key}){
     List<Widget> butList=[];
     Dialog errorDialog= Dialog(

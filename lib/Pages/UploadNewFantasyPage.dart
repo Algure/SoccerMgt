@@ -7,23 +7,26 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:soccermgt/customViews/ImageLong.dart';
 import 'package:soccermgt/customViews/my_button.dart';
 
 import '../EventsObject.dart';
 import '../constants.dart';
 import '../utilities.dart';
 
-class UploadTeamPage extends StatefulWidget {
-  BuildContext oldContext;
+class UploadNewFantasyPage extends StatefulWidget {
 
-  UploadTeamPage({this.oldContext});
+  BuildContext oldContext;
+  String uploadHook;
+  UploadNewFantasyPage(this.oldContext, {this.uploadHook="fantasy"});
 
   @override
-  _UploadTeamPageState createState() => _UploadTeamPageState();
+  _UploadNewFantasyPageState createState() => _UploadNewFantasyPageState();
 }
 
-class _UploadTeamPageState extends State<UploadTeamPage> {
+class _UploadNewFantasyPageState extends State<UploadNewFantasyPage> {
   bool progress=false;
+
   final picker= ImagePicker();
   List filePaths=[];
   List<String> imageUrls=[];
@@ -34,9 +37,8 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
   String downloadUrl;
   List<Widget> DisplayFormatsList=[];
   String title="";
-  String speed="";
-  String power="";
-  String shot="";
+  String widgetType="";
+  String clickLink="";
   Widget selectedWidget;
   EventsObject eventsObject;
   FocusNode linkNode=FocusNode();
@@ -50,20 +52,18 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         backgroundColor: Colors.white,
-        title: Text("Upload New Team", style: TextStyle(color:Colors.black),),
+        title: Text("Upload Event", style: TextStyle(color:Colors.black),),
         leading: FlatButton(
             onPressed: (){
               Navigator.pop(context);
             },
             child: Icon(Icons.keyboard_backspace, color: Colors.black,)),
       ),
-
       body: ModalProgressHUD(
         inAsyncCall: progress,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SingleChildScrollView(
-
             child: Container(
               color: Color(0xffdddddd),
               child: Column(
@@ -75,7 +75,6 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
                       decoration: BoxDecoration(
                           border: Border.all(),
                           borderRadius: BorderRadius.all(Radius.circular(10))
-
                       ),
                       child: Image.file(file,  height: 250, width: double.maxFinite, fit: BoxFit.cover,)
                   ),
@@ -84,7 +83,7 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: MyButton(text: 'Select Team logo', buttonColor: Colors.blue, onPressed: (){
+                          child: MyButton(text: 'Select Image', buttonColor: Colors.blue, onPressed: (){
                             selectImage();
                           }),
                         ),
@@ -93,7 +92,6 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
                             filePath="";
                             file=File('');
                             setState(() {
-
                             });
                           }),
                         ),
@@ -115,7 +113,7 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        hintText: 'Enter club name',
+                        hintText: 'Enter title of event',
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                             borderSide: BorderSide(
@@ -124,22 +122,22 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
                             )),
                       )
                   ),
+
                   SizedBox(height: 20,width: double.infinity),
                   TextField(
                       controller: TextEditingController(
-                          text: speed
+                          text: clickLink
                       ),
+                      focusNode: linkNode,
                       style: TextStyle(color: Colors.black),
                       textAlign: TextAlign.start,
-                      onChanged: (text){speed=text;},
-                      maxLines:1,
-                      maxLength: 2,
-                      keyboardType: TextInputType.number,
+                      onChanged: (text){clickLink=text;},
+                      maxLines:2,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        hintText: 'Enter average speed of players',
+                        hintText: 'Enter link for game click',
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                             borderSide: BorderSide(
@@ -148,55 +146,9 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
                             )),
                       )
                   ),
-                  SizedBox(height: 20,width: double.infinity),
-                  TextField(
-                      controller: TextEditingController(
-                          text: power
-                      ),
-                      style: TextStyle(color: Colors.black),
-                      textAlign: TextAlign.start,
-                      onChanged: (text){power=text;},
-                      maxLines:1,
-                      maxLength: 2,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'Enter average power of players',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            borderSide: BorderSide(
-                                color: Colors.black,
-                                width: 1.5
-                            )),
-                      )
-                  ),
-                  SizedBox(height: 20,width: double.infinity),
-                  TextField(
-                      controller: TextEditingController(
-                          text: shot
-                      ),
-                      style: TextStyle(color: Colors.black),
-                      textAlign: TextAlign.start,
-                      onChanged: (text){shot=text;},
-                      maxLines:1,
-                      maxLength: 2,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: 'Enter average shot of players',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            borderSide: BorderSide(
-                                color: Colors.black,
-                                width: 1.5
-                            )),
-                      )
-                  ),
+
                   SizedBox(height: 20),
+
                   MyButton(text: 'Upload', onPressed: (){
                     showUploadPreviewDialog();
                   })
@@ -209,6 +161,10 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
     );
   }
 
+  setupDisplayFormatList(){
+    eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,clickLink: clickLink);
+  }
+
   selectImage() async {
     showProgress(true);
     PickedFile tempFile= await picker.getImage(source: ImageSource.gallery);
@@ -216,6 +172,7 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
     String compressedPath= await compressImage(File(tempFile.path).absolute.path);
     filePath=compressedPath;
     file=File(filePath);
+//    setupDisplayFormatList2();
     showProgress(false);
   }
 
@@ -258,24 +215,10 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
   }
 
   void showUploadPreviewDialog() {
-    if(title==null || title.isEmpty){
-      uShowErrorDialog(context, "Title cannot be empty");
-      return;
-    }
-    if(power==null || power.isEmpty){
-      uShowErrorDialog(context, "Power cannot be empty");
-      return;
-    }
-    if(speed==null || speed.isEmpty){
-      uShowErrorDialog(context, "Speed cannot be empty");
-      return;
-    }
-    if(shot==null || shot.isEmpty){
-      uShowErrorDialog(context, "Shot cannot be empty");
-      return;
-    }
-    if(filePath==null || filePath.isEmpty){
-      uShowErrorDialog(context, "Logo cannot be empty");
+    if((filePath==null||filePath.trim().isEmpty)&&
+        (clickLink==null||clickLink.trim().isEmpty))
+    {
+      uShowErrorDialog(context, "Event cannot be empty");
       return;
     }
     Dialog errorDialog= Dialog(
@@ -289,7 +232,7 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
             Image.file(file, height: (filePath!=null && filePath.isNotEmpty)? 150:0,),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(description, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+              child: Text(clickLink, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
             ),
             SizedBox(height: 20,),
             Container(
@@ -308,7 +251,7 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
       ),
     );
     showGeneralDialog(context: context,
-        barrierLabel: 'kuuuuuusd',
+        barrierLabel: 'kudfdusd',
         barrierDismissible: true,
         barrierColor: Colors.black.withOpacity(0.5),
         transitionDuration: Duration(milliseconds: 500),
@@ -325,7 +268,16 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
 
   Future<void> startUploadSequence() async {
     String uploadPack='';
-
+    if(
+        (filePath==null||filePath.trim().isEmpty))
+    {
+      uShowErrorDialog(context, "Insufficient details");
+      return;
+    }
+    if( (widgetType==null||widgetType.trim().isEmpty)){
+      uShowErrorDialog(context, "You must select a widget type");
+      return;
+    }
     showProgress(true);
     if(!(await uCheckInternet())){
       uShowNoInternetDialog(context);
@@ -337,22 +289,18 @@ class _UploadTeamPageState extends State<UploadTeamPage> {
       picUrl = await uploadPicsGetUrl();
     }
     print('picUrl= $picUrl');
-//    List<String> dataList= teamData.split('<');
-////    teamName=dataList[0];
-////    teamSpeed=dataList[1];
-////    teamPower=dataList[2];
-////    teamShot=dataList[3];
-////    teamLogo=dataList[4];
-    uploadPack='$title<$speed<$power<$shot<$picUrl';
+//    uploadPack+='<'+description;
+//    EventsObject eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,clickLink: clickLink);
+//    eventsObject.imageUrl=picUrl;
     print('upload pack: ${eventsObject.toString()}');
-    await FirebaseDatabase.instance.reference().child('Teams').child(getUniqueId()).set(uploadPack);
+    await FirebaseDatabase.instance.reference().child('${widget.uploadHook}').child(getUniqueId()).set('$picUrl<$filePath');
     showProgress(false);
     Navigator.pop(context);
     showItemUploadedDialog(widget.oldContext);
   }
 
   void showItemUploadedDialog(BuildContext context) {
-    uShowCustomDialog(context:context,icon: Icons.done, iconColor: Colors.green, text: 'Team has been uploaded');
+    uShowCustomDialog(context:context,icon: Icons.done, iconColor: Colors.green, text: 'Event has been uploaded');
   }
 
 }

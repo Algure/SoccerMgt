@@ -27,11 +27,15 @@ class TeamWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+
+      margin: EdgeInsets.all(5),
       child: GestureDetector(
         onTap: onTeamPressed??(){
 
         },
+
         child: ListTile(
+          tileColor: Colors.white,
           leading: Image.network(kImageUrlStart+teamLogo, height: 70, width: 70,),
           title: Text(teamName, style: kTitleStyle,),
           subtitle: Row(

@@ -204,6 +204,9 @@ class _UploadPageState extends State<UploadPage> {
                   Text("Select Display format", style: TextStyle(color: Colors.black),),
                   SizedBox(height: 5),
                   Container(
+                      color: Colors.transparent,
+                      child:selectedWidget??Container()),
+                  Container(
                     height: kWidgetWidth*2,
                     width: double.infinity,
                     child: SingleChildScrollView(
@@ -286,9 +289,7 @@ class _UploadPageState extends State<UploadPage> {
                       ),
                     ),
                   ),
-                  Container(
-                      color: Colors.transparent,
-                      child:selectedWidget??Container()),
+
                   SizedBox(height: 20),
 
                   MyButton(text: 'Upload', onPressed: (){
@@ -312,7 +313,6 @@ class _UploadPageState extends State<UploadPage> {
 
   setupDisplayFormatList(){
      eventsObject=EventsObject(title: title, value: description, imageUrl: filePath, widgetType: widgetType,clickLink: clickLink);
-
   }
 
   selectImage() async {
@@ -365,8 +365,13 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   void showUploadPreviewDialog() {
-    if(description==null || description.isEmpty){
-      uShowErrorDialog(context, "Description cannot be empty");
+    if((title==null||title.trim().isEmpty)&&
+        (description==null||description.trim().isEmpty)&&
+        (filePath==null||filePath.trim().isEmpty)&&
+        (widgetType==null||widgetType.trim().isEmpty)&&
+        (clickLink==null||clickLink.trim().isEmpty))
+    {
+      uShowErrorDialog(context, "Event cannot be empty");
       return;
     }
     Dialog errorDialog= Dialog(

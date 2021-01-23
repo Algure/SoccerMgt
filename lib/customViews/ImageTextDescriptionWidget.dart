@@ -24,6 +24,7 @@ class ImageTextDescriptionWidget extends StatelessWidget {
       child: Container(
         width: kWidgetWidth*1.5+(isFromNetwork?50:0),
         color: Colors.white,
+        margin: EdgeInsets.all(3),
         height: kWidgetWidth*0.5,
         child: ListTile(
           leading:isFromNetwork?Image.network(kImageUrlStart+_eventsObject.imageUrl??"",  fit: BoxFit.cover, width:kWidgetWidth*0.3, height: kWidgetWidth*0.3,):
@@ -36,11 +37,10 @@ class ImageTextDescriptionWidget extends StatelessWidget {
           width: 50,
           child: FlatButton(
             onPressed: deleteItemFunc??(){},
-      child: Column(
-          children: [
+      child: Center(
+          child:
             Icon(Icons.clear, color: Colors.red,),
-            Text('Delete Event', style: TextStyle(color: Colors.red),)
-          ],
+
       ),
     ),
         ):Container(width: 1,),

@@ -1,35 +1,36 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:intl/intl.dart';
-import 'package:soccermgt/Pages/TeamDataPage.dart';
-import 'package:soccermgt/Pages/TournamentsPage.dart';
-import 'package:soccermgt/Pages/UploadTeamPage.dart';
-import 'package:soccermgt/customViews/TeamWidget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soccermgt/Pages/MainEventsPage.dart';
+import 'package:soccermgt/customViews/FantasyView.dart';
+import 'package:soccermgt/customViews/ImageLong.dart';
 import 'package:soccermgt/customViews/my_button.dart';
-import 'package:soccermgt/database/TeamsDatabase.dart';
+import 'package:soccermgt/database/FantasyDatabase.dart';
+import 'package:soccermgt/database/OnlineEventsDB.dart';
+import 'package:soccermgt/database/TeamsDataDatabase.dart';
 
 import '../EventData.dart';
+import '../EventsObject.dart';
 import '../utilities.dart';
-import 'FantasyDataPage.dart';
-import 'MainEventsPage.dart';
-import 'UploadPage.dart';
+import 'LoginPage.dart';
+import 'TeamsPage.dart';
+import 'TournamentsPage.dart';
+import 'UploadNewFantasyPage.dart';
 
-class TeamsPage extends StatefulWidget {
+class FantasyDataPage extends StatefulWidget {
   @override
-  _TeamsPageState createState() => _TeamsPageState();
+  _FantasyDataPageState createState() => _FantasyDataPageState();
 }
 
-class _TeamsPageState extends State<TeamsPage> {
+class _FantasyDataPageState extends State<FantasyDataPage> {
+  int _counter = 0;
   List<Widget> itemList=[];
-  bool progress=false;
+  bool progress;
   RefreshController _refreshController=RefreshController(initialRefresh: false);
-
-  @override
-  void initState() {
-    getAllMarketItems(context);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +39,19 @@ class _TeamsPageState extends State<TeamsPage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         backgroundColor: Colors.white,
-        title: Text("Teams", style: TextStyle(color: Colors.black, fontSize: 20),),
+
+        title: Text('Fantasy games', style: TextStyle(color: Colors.black, fontSize: 16),),
         actions: [
           FlatButton(
               onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>UploadTeamPage(oldContext: context)));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>UploadNewFantasyPage(context)));
               },
               child: Icon(Icons.add, color: Colors.black,)),
+          FlatButton(
+              onPressed: (){
+                displayAboutDialog();
+              },
+              child: Icon(Icons.info_outline, color: Colors.black,))
         ],
       ),
       body: ModalProgressHUD(
@@ -73,7 +80,7 @@ class _TeamsPageState extends State<TeamsPage> {
           BottomNavigationBarItem(icon: Icon(Icons.sports_volleyball), label: 'Fantasy'),
         ],
         backgroundColor: Colors.black,
-        currentIndex: 1,
+        currentIndex: 3,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
         onTap: (dex){
@@ -98,18 +105,17 @@ class _TeamsPageState extends State<TeamsPage> {
     );
   }
 
-
   Future<void> getAllMarketItems(BuildContext context) async {
     showProgress(true);
     DateTime now= DateTime.now();
     String formattedDate=  DateFormat('YY:MM:dd').format(now);
-    if(!(await uCheckInternet()) || ((await uGetSharedPrefValue('ldateteam')).toString())==formattedDate){
+    if(!(await uCheckInternet()) || ((await uGetSharedPrefValue('ldate')).toString())==formattedDate){
       showProgress(false);
       await setListFromDb();
       return;
     }
     itemList=[];
-    DatabaseReference myRef=FirebaseDatabase.instance.reference().child('Teams');
+    DatabaseReference myRef=FirebaseDatabase.instance.reference().child('fantasy');
     DataSnapshot snapShot=await myRef.once();
     print('gotten value');
     print(snapShot.value.toString());
@@ -118,19 +124,17 @@ class _TeamsPageState extends State<TeamsPage> {
       return;
     }
     Map<dynamic , dynamic> maps= Map.from(snapShot.value);
-    TeamsDb sDb = TeamsDb();
+    FantasyDb sDb = FantasyDb();
+
     for (var key in maps.keys){
       await sDb.insertItem(id: key, item: maps[key].toString());
       String eventDetails=maps[key];
       try {
-          itemList.add(TeamWidget( teamData:maps[key].toString(),
-              onTeamPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>TeamDataPage(teamName: eventDetails.split('<')[0] ,teamId: key.toString(),)));
-              }
-              ,onDeletePressed:
-              (){
+        EventsObject eveOb = EventsObject.fromString(eventDetails);
+        itemList.add(
+            FantasyView(eventDetails, isFromNetwork: true, deleteItemFunc: () {
               deleteItem(key.toString());
-          },));
+            },));
       }catch(e){
         print("Event add exception ${e.toString()}");
       }
@@ -139,6 +143,7 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   void showProgress(bool b) {
+
     setState(() {
       progress=b;
       _refreshController.refreshCompleted();
@@ -148,18 +153,19 @@ class _TeamsPageState extends State<TeamsPage> {
   Future<void> setListFromDb() async {
     showProgress(true);
     itemList=[];
-    TeamsDb sDb = TeamsDb();
+    FantasyDb sDb = FantasyDb();
     List<EventData> eventsList=await sDb.getEvents();
     for(EventData eves in eventsList){
+//      itemList.add(EventItem(eventItem: eves,deleteItemFunc:  (){
+//        deleteItem(eves.l);
+//      }),);
       try {
-        itemList.add(TeamWidget( teamData:eves.e,
-            onTeamPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>TeamDataPage(teamName: eves.e.split('<')[0]
-                ,teamId: eves.l.toString(),)));
-            },
-          onDeletePressed: (){
-            deleteItem(eves.l);
-          },));
+        EventsObject eveOb = EventsObject.fromString(eves.e);
+        itemList.add(
+            FantasyView(eves.e, isFromNetwork: true, deleteItemFunc: () {
+              deleteItem(eves.l.toString());
+            },));
+
       }catch(e){
         print("Event add exception ${e.toString()}");
       }
@@ -177,16 +183,17 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   void reDownloadItems() async{
+
     showProgress(true);
     DateTime now= DateTime.now();
     String formattedDate=  DateFormat('YY:MM:dd').format(now);
-    if(!(await uCheckInternet()) || ((await uGetSharedPrefValue('ldateteam')).toString())==formattedDate){
+    if(!(await uCheckInternet()) || ((await uGetSharedPrefValue('ldate')).toString())==formattedDate){
       showProgress(false);
       await setListFromDb();
       return;
     }
     itemList=[];
-    DatabaseReference myRef=FirebaseDatabase.instance.reference().child('Teams');
+    DatabaseReference myRef=FirebaseDatabase.instance.reference().child('News');
     DataSnapshot snapShot=await myRef.once();
     print('gotten value');
     print(snapShot.value.toString());
@@ -195,20 +202,18 @@ class _TeamsPageState extends State<TeamsPage> {
       return;
     }
     Map<dynamic , dynamic> maps= Map.from(snapShot.value);
-    TeamsDb sDb = TeamsDb();
+    FantasyDb sDb = FantasyDb();
+
     for (var key in maps.keys){
       await sDb.insertItem(id: key, item: maps[key].toString());
       String eventDetails=maps[key];
       try {
-        itemList.add(TeamWidget( teamData:maps[key].toString(),
-            onTeamPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>TeamDataPage(teamName: eventDetails.split('<')[0]
-                ,teamId: key.toString(),)));
-            },onDeletePressed: (){
+        EventsObject eveOb = EventsObject.fromString(eventDetails);
+        itemList.add(FantasyView(eventDetails, isFromNetwork: true,deleteItemFunc: (){
           deleteItem(key.toString());
         },));
       }catch(e){
-        print("Event update exception ${e.toString()}");
+        print("Event add exception ${e.toString()}");
       }
     }
     showProgress(false);
@@ -222,6 +227,7 @@ class _TeamsPageState extends State<TeamsPage> {
       applicationLegalese: 'Brought to you by Cyber-Techies',
       applicationVersion: '1.0.0',
       applicationIcon:Container(child: Icon(Icons.sports_volleyball,size: 70, color: Colors.deepPurple,),),
+
     );
   }
 
@@ -272,11 +278,21 @@ class _TeamsPageState extends State<TeamsPage> {
     }
     print('key2delete: '+key);
     showProgress(true);
-    await FirebaseDatabase.instance.reference().child('Teams').child(key).remove();
+    await FirebaseDatabase.instance.reference().child('fantasy').child(key).remove();
     print('DELETED+');
-    TeamsDb sDb = TeamsDb();
+    OnlineEventsDb sDb = OnlineEventsDb();
     await sDb.deleteItem(key);
     setListFromDb();
+  }
+
+  Future<void> loginIfNecessary() async {
+    SharedPreferences sp=await SharedPreferences.getInstance();
+    if(sp.containsKey('id')){
+      String s=await sp.get('id').toString();
+      if(s=='null' || s.isEmpty)
+        Navigator.push(context, MaterialPageRoute(builder:(context)=>LoginPage()));
+      return;
+    }
   }
 
 }

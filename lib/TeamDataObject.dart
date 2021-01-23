@@ -13,9 +13,15 @@ class TeamData{
     };
   }
 
+  TeamData.fromFirebase({var map, String teamId, String itemId}) {
+    this.i=itemId;
+    this.e=map.toString();
+    this.t= teamId;
+  }
+
   TeamData.fromMap(var map) {
     this.i=map['i'];
     this.e=map['e'];
-    this.t=map['t'];
+    this.t= map['t'];
   }
 }

@@ -27,7 +27,8 @@ class ImageTransText extends StatelessWidget {
           (_eventsObject.imageUrl!=null)?FileImage(File(_eventsObject.imageUrl??""),): AssetImage('images/footim.jpg', ), fit: BoxFit.cover)
           ,color: Colors.white,
         ),
-        height: kWidgetWidth*0.8+(isFromNetwork?50:0),
+          margin: EdgeInsets.all(3),
+          height: kWidgetWidth*0.8+(isFromNetwork?50:0),
         width: kWidgetWidth,
         child:Column(
           children: [

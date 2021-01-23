@@ -25,6 +25,7 @@ class ImageTransTextUpWidget extends StatelessWidget {
         height: kWidgetWidth*1.4+(isFromNetwork?50:0),
         color: Colors.white,
         width: kWidgetWidth,
+        margin: EdgeInsets.all(3),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

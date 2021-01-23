@@ -25,6 +25,7 @@ class ImageLongWithTextWidget extends StatelessWidget {
       child: Container(
         height: kWidgetWidth*1.5+(isFromNetwork?50:0),
         color: Colors.white,
+        margin: EdgeInsets.all(3),
         width: kWidgetWidth,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +37,7 @@ class ImageLongWithTextWidget extends StatelessWidget {
             ),
             SizedBox(height: 10),
             if(isFromNetwork)
-              Image.network(kImageUrlStart+_eventsObject.imageUrl, fit: BoxFit.cover, width:kWidgetWidth, height: kWidgetWidth,)
+              Image.network(kImageUrlStart+_eventsObject.imageUrl, fit: BoxFit.cover, width:double.infinity, height: kWidgetWidth,)
             else
               if(_eventsObject.imageUrl!=null)Image.file(File(_eventsObject.imageUrl??""), fit: BoxFit.cover, width: kWidgetWidth, height: kWidgetWidth,)
               else Image.asset('images/footim.jpg',  fit: BoxFit.cover,width: kWidgetWidth, height: kWidgetWidth,),
